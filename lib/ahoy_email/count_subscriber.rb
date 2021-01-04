@@ -32,27 +32,38 @@ module AhoyEmail
 
     # TODO support other database adapters
     def with_lock(key)
-      lock_id = 1 # TODO hash key
-      retries = 0
+      lock_id = Zlib.crc32(key.join("/"))
+      lock_acquired = false
       connection = Ahoy::Counter.connection
-      begin
-        started_at = Time.now
 
-        loop do
-          if connection.get_advisory_lock(lock_id)
+      started_at = Time.now
+
+      begin
+        with_retries(10) do
+          lock_acquired = connection.get_advisory_lock(lock_id)
+          if lock_acquired
             puts "Waited for #{((Time.now - started_at) * 1000.0).round}ms"
             started_at = Time.now
             yield
             puts "Locked for #{((Time.now - started_at) * 1000.0).round}ms"
-            break
-          else
-            retries += 1
-            sleep(0.01)
-            raise "Lock not acquired" if retries > 10
           end
+          lock_acquired
         end
       ensure
-        connection.release_advisory_lock(lock_id)
+        connection.release_advisory_lock(lock_id) if lock_acquired
+      end
+    end
+
+    def with_retries(count)
+      retries = 0
+      loop do
+        success = yield
+        break if success
+
+        raise "Lock not acquired" if retries >= 10
+
+        retries += 1
+        sleep(0.01)
       end
     end
   end
