@@ -61,6 +61,7 @@ class ClickTest < ActionDispatch::IntegrationTest
       message2 = ClickMailer.basic.deliver_now
       click_link(message2)
 
+      assert_equal 2, Ahoy::Counter.count
       assert_equal "ClickMailer#basic", ahoy_counter.mailer
       assert_equal "click", ahoy_counter.name
       assert_equal "https://example.org", ahoy_counter.url

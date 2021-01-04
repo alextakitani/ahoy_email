@@ -6,11 +6,11 @@ module AhoyEmail
 
     def click(event)
       count_event("click", event)
+      count_event("click", event, url: event[:url])
     end
 
-    def count_event(name, event)
+    def count_event(name, event, url: nil)
       mailer = event[:mailer]
-      url = event[:url]
 
       with_lock([mailer, name, url]) do
         counter = Ahoy::Counter.where(mailer: mailer, name: name, url: url).first_or_create!
