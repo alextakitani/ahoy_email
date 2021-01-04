@@ -64,7 +64,8 @@ class ClickTest < ActionDispatch::IntegrationTest
       assert_equal "ClickMailer#basic", ahoy_counter.mailer
       assert_equal "click", ahoy_counter.name
       assert_equal "https://example.org", ahoy_counter.url
-      assert_equal 2, ahoy_counter.value
+      assert_equal 3, ahoy_counter.total
+      assert_equal 2, ahoy_counter.unique
     end
   end
 
@@ -82,7 +83,8 @@ class ClickTest < ActionDispatch::IntegrationTest
       end
       threads.map(&:join)
 
-      assert_equal 5, ahoy_counter.value
+      assert_equal 10, ahoy_counter.total
+      assert_equal 5, ahoy_counter.unique
     end
   end
 

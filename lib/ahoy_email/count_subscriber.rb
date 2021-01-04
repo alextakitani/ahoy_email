@@ -23,8 +23,9 @@ module AhoyEmail
           end
         hll.offer(event[:token])
 
+        counter.total += 1
         # cache the value for BI tools
-        counter.value = hll.cardinality
+        counter.unique = [hll.cardinality, counter.total].min
         counter.data = hll.serialize
         counter.save!
       end

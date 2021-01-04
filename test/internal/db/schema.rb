@@ -27,7 +27,8 @@ ActiveRecord::Schema.define do
     t.string :mailer
     t.string :name
     t.text :url
-    t.integer :value, default: 0
+    t.integer :total, default: 0
+    t.integer :unique, default: 0
     t.binary :data
     t.datetime :created_at
   end
