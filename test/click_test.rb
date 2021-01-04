@@ -50,6 +50,24 @@ class ClickTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_count_subscriber
+    skip if defined?(Mongoid)
+
+    with_subscriber(AhoyEmail::CountSubscriber) do
+      message = ClickMailer.basic.deliver_now
+      click_link(message)
+      click_link(message)
+
+      message2 = ClickMailer.basic.deliver_now
+      click_link(message2)
+
+      assert_equal "ClickMailer#basic", ahoy_counter.mailer
+      assert_equal "click", ahoy_counter.name
+      assert_equal "https://example.org", ahoy_counter.url
+      assert_equal 2, ahoy_counter.value
+    end
+  end
+
   def test_bad_signature
     message = ClickMailer.basic.deliver_now
     assert_body "click", message

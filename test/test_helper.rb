@@ -3,6 +3,7 @@ require "combustion"
 Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
+require "hyperll"
 
 AhoyEmail.api = true
 
@@ -11,6 +12,9 @@ Combustion.initialize! :active_record, :action_mailer do
   if ActiveRecord::VERSION::MAJOR < 6 && config.active_record.sqlite3.respond_to?(:represent_boolean_as_integer)
     config.active_record.sqlite3.represent_boolean_as_integer = true
   end
+
+  logger = ActiveSupport::Logger.new(ENV["VERBOSE"] ? STDOUT : nil)
+  config.logger = logger
 end
 
 require_relative "support/mongoid" if defined?(Mongoid)
@@ -30,10 +34,15 @@ end
 class Minitest::Test
   def setup
     Ahoy::Message.delete_all
+    Ahoy::Counter.delete_all
   end
 
   def ahoy_message
     Ahoy::Message.last
+  end
+
+  def ahoy_counter
+    Ahoy::Counter.last
   end
 
   def refute_body(str, message)

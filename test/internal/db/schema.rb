@@ -23,6 +23,17 @@ ActiveRecord::Schema.define do
     t.string :utm_campaign
   end
 
+  create_table :ahoy_counters, force: true do |t|
+    t.string :mailer
+    t.string :name
+    t.text :url
+    t.integer :value, default: 0
+    t.binary :data
+    t.datetime :created_at
+  end
+
+  add_index :ahoy_counters, [:mailer, :name, :url], unique: true
+
   create_table :users, force: true do |t|
     t.string :email
   end

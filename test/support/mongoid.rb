@@ -37,3 +37,14 @@ class Ahoy::Message
   field :utm_medium, type: String
   field :utm_content, type: String
 end
+
+class Ahoy::Counter
+  include Mongoid::Document
+
+  field :mailer, type: String
+  field :name, type: String
+  field :url, type: String
+  field :value, type: Integer
+  field :data, type: BSON::Binary
+  field :created_at, type: Time
+end

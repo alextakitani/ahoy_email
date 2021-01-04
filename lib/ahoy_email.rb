@@ -6,6 +6,7 @@ require "openssl"
 require "safely/core"
 
 # modules
+require "ahoy_email/count_subscriber"
 require "ahoy_email/processor"
 require "ahoy_email/tracker"
 require "ahoy_email/observer"
