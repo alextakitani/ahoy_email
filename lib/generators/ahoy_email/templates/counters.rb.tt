@@ -1,0 +1,14 @@
+class <%= migration_class_name %> < ActiveRecord::Migration<%= migration_version %>
+  def change
+    create_table :ahoy_counters do |t|
+      t.string :mailer
+      t.string :name
+      t.text :url
+      t.integer :value, default: 0
+      t.binary :data
+      t.datetime :created_at
+    end
+
+    add_index :ahoy_counters, [:mailer, :name, :url], unique: true
+  end
+end
