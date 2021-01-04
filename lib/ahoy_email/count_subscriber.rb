@@ -23,6 +23,7 @@ module AhoyEmail
           end
         hll.offer(event[:token])
 
+        # cache the value for BI tools
         counter.value = hll.cardinality
         counter.data = hll.serialize
         counter.save!
