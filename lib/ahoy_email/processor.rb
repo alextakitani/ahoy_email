@@ -112,7 +112,7 @@ module AhoyEmail
                 id: token,
                 url: link["href"],
                 # TODO encode
-                mailer: options[:mailer],
+                c: options[:mailer].sub("Mailer#", "#").underscore.parameterize,
                 signature: signature
               )
           end
