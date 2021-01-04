@@ -110,6 +110,8 @@ module AhoyEmail
                 action: "click",
                 id: token,
                 url: link["href"],
+                # TODO encode
+                mailer: options[:mailer],
                 signature: signature
               )
           end

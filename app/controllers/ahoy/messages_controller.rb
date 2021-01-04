@@ -44,7 +44,8 @@ module Ahoy
     protected
 
     def set_message
-      @token =  params[:id]
+      @token = params[:id]
+      @mailer = params[:mailer] # TODO sign
 
       model = AhoyEmail.message_model
 
@@ -60,6 +61,7 @@ module Ahoy
           event[:message] = @message
           event[:controller] = self
           event[:token] = @token
+          event[:mailer] = @mailer
           subscriber.send name, event
         end
       end

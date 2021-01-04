@@ -9,8 +9,7 @@ module AhoyEmail
     end
 
     def count_event(name, event)
-      # TODO don't use message
-      mailer = event[:message].mailer
+      mailer = event[:mailer]
       url = event[:url]
 
       with_lock([mailer, name, url]) do
