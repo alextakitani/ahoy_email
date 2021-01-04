@@ -64,7 +64,10 @@ module AhoyEmail
         success = yield
         break if success
 
-        raise "Lock not acquired" if retries >= 10
+        if retries >= 10
+          warn "[ahoy_email] Lock not acquired"
+          break
+        end
 
         retries += 1
         sleep(0.01)
