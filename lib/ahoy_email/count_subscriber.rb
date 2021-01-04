@@ -30,27 +30,32 @@ module AhoyEmail
       end
     end
 
-    # TODO support other database adapters
     def with_lock(key)
-      lock_id = Zlib.crc32(key.join("/"))
-      lock_acquired = false
       connection = Ahoy::Counter.connection
 
-      started_at = Time.now
+      # MySQL and Postgres
+      if connection.advisory_locks_enabled?
+        lock_id = Zlib.crc32(key.join("/"))
+        lock_acquired = false
 
-      begin
-        with_retries(10) do
-          lock_acquired = connection.get_advisory_lock(lock_id)
-          if lock_acquired
-            puts "Waited for #{((Time.now - started_at) * 1000.0).round}ms"
-            started_at = Time.now
-            yield
-            puts "Locked for #{((Time.now - started_at) * 1000.0).round}ms"
+        started_at = Time.now
+
+        begin
+          with_retries(10) do
+            lock_acquired = connection.get_advisory_lock(lock_id)
+            if lock_acquired
+              puts "Waited for #{((Time.now - started_at) * 1000.0).round}ms"
+              started_at = Time.now
+              yield
+              puts "Locked for #{((Time.now - started_at) * 1000.0).round}ms"
+            end
+            lock_acquired
           end
-          lock_acquired
+        ensure
+          connection.release_advisory_lock(lock_id) if lock_acquired
         end
-      ensure
-        connection.release_advisory_lock(lock_id) if lock_acquired
+      else
+        yield
       end
     end
 
