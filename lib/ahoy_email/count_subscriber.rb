@@ -40,7 +40,7 @@ module AhoyEmail
         started_at = Time.now
 
         begin
-          with_retries(10) do
+          with_tries(10) do
             lock_acquired = connection.get_advisory_lock(lock_id)
             if lock_acquired
               puts "Waited for #{((Time.now - started_at) * 1000.0).round}ms"
@@ -58,18 +58,17 @@ module AhoyEmail
       end
     end
 
-    def with_retries(count)
-      retries = 0
+    def with_tries(tries)
       loop do
         success = yield
         break if success
 
-        if retries >= count
+        if tries == 0
           warn "[ahoy_email] Lock not acquired"
           break
         end
 
-        retries += 1
+        tries -= 1
         sleep(0.01)
       end
     end
