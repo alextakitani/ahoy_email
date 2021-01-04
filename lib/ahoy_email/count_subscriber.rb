@@ -43,10 +43,10 @@ module AhoyEmail
           with_tries(10) do
             lock_acquired = connection.get_advisory_lock(lock_id)
             if lock_acquired
-              puts "Waited for #{((Time.now - started_at) * 1000.0).round}ms"
+              # puts "Waited for #{((Time.now - started_at) * 1000.0).round}ms"
               started_at = Time.now
               yield
-              puts "Locked for #{((Time.now - started_at) * 1000.0).round}ms"
+              # puts "Locked for #{((Time.now - started_at) * 1000.0).round}ms"
             end
             lock_acquired
           end
