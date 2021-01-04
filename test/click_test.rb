@@ -78,7 +78,6 @@ class ClickTest < ActionDispatch::IntegrationTest
         threads << Thread.new do
           click_link(message)
           click_link(message)
-          click_link(message)
         end
       end
       threads.map(&:join)
