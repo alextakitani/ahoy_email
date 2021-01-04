@@ -68,6 +68,25 @@ class ClickTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_count_subscriber_concurrency
+    skip if defined?(Mongoid)
+
+    with_subscriber(AhoyEmail::CountSubscriber) do
+      messages = 5.times.map { ClickMailer.basic.deliver_now }
+      threads = []
+      messages.each do |message|
+        threads << Thread.new do
+          click_link(message)
+          click_link(message)
+          click_link(message)
+        end
+      end
+      threads.map(&:join)
+
+      assert_equal 5, ahoy_counter.value
+    end
+  end
+
   def test_bad_signature
     message = ClickMailer.basic.deliver_now
     assert_body "click", message
