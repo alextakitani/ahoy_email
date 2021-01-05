@@ -1,16 +1,10 @@
 # Ahoy Email
 
-:postbox: Email analytics for Rails
+First-party email analytics for Rails
 
-You get:
-
-- A history of emails sent to each user
-- Easy UTM tagging
-- Optional open and click tracking
+:fire: For web and native app analytics, check out [Ahoy](https://github.com/ankane/ahoy)
 
 :bullettrain_side: To manage unsubscribes, check out [Mailkick](https://github.com/ankane/mailkick)
-
-:fire: To track visits and events, check out [Ahoy](https://github.com/ankane/ahoy)
 
 [![Build Status](https://github.com/ankane/ahoy_email/workflows/build/badge.svg?branch=master)](https://github.com/ankane/ahoy_email/actions)
 
@@ -29,11 +23,17 @@ rails generate ahoy_email:install
 rails db:migrate
 ```
 
-## How It Works
+## Getting Started
 
-### Message History
+There are three main features:
 
-Ahoy creates an `Ahoy::Message` record for each email sent by default. You can disable history for a mailer:
+- [Message history](#message-history)
+- [UTM tagging](#utm-tagging)
+- [Open & click analytics](#open--click-analytics)
+
+## Message History
+
+Ahoy Email creates an `Ahoy::Message` record for each email sent by default. You can disable history for a mailer:
 
 ```ruby
 class CouponMailer < ApplicationMailer
@@ -49,7 +49,7 @@ AhoyEmail.default_options[:message] = false
 
 ### Users
 
-Ahoy records the user a message is sent to - not just the email address. This gives you a history of messages for each user, even if they change addresses.
+Ahoy Email records the user a message is sent to - not just the email address. This gives you a history of messages for each user, even if they change addresses.
 
 By default, Ahoy tries `@user` then `params[:user]` then `User.find_by(email: message.to)` to find the user.
 
@@ -107,9 +107,15 @@ class CouponMailer < ApplicationMailer
 end
 ```
 
-### UTM Tagging
+## UTM Tagging
 
-Automatically add UTM parameters to links.
+Use UTM tagging to attribute a conversion (like an order) to an email campaign. If you use [Ahoy](https://github.com/ankane/ahoy) for web analytics:
+
+1. Send an email with UTM parameters
+2. When a user visits the site, Ahoy will create a visit with the UTM parameters
+3. When a user orders, the visit will be associated with the order (if [configured](https://github.com/ankane/ahoy#associated-models))
+
+Add UTM parameters to links with:
 
 ```ruby
 class CouponMailer < ApplicationMailer
@@ -137,11 +143,11 @@ Skip specific links with:
 <%= link_to "Go", some_url, data: {skip_utm_params: true} %>
 ```
 
-### Opens & Clicks
+## Open & Click Analytics
 
 While it’s nice to get feedback on the performance of your emails, we discourage the use of open tracking. If you do decide to use open or click tracking, be sure to get consent from your users and consider a short retention period. Check out [this article](https://www.eff.org/deeplinks/2019/01/stop-tracking-my-emails) for more best practices.
 
-#### Setup
+### Setup
 
 Create a migration with:
 
@@ -170,11 +176,27 @@ And add to mailers you want to track:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track open: true, click: true # use only/except to limit actions
+  track open: true, click: true
 end
 ```
 
-#### How It Works
+Use only and except to limit actions
+
+```ruby
+class CouponMailer < ApplicationMailer
+  track click: true, only: [:welcome]
+end
+```
+
+Or make it conditional
+
+```ruby
+class CouponMailer < ApplicationMailer
+  track click: -> { params[:user].opted_in? }
+end
+```
+
+### How It Works
 
 For opens, an invisible pixel is added right before the `</body>` tag in HTML emails. If the recipient has images enabled in their email client, the pixel is loaded and the open time recorded.
 
@@ -210,7 +232,7 @@ You can specify the domain to use with:
 AhoyEmail.default_options[:url_options] = {host: "mydomain.com"}
 ```
 
-#### Events
+### Events
 
 Subscribe to open and click events by adding to the initializer:
 

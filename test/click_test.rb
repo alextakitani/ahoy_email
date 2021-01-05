@@ -144,16 +144,4 @@ class ClickTest < ActionDispatch::IntegrationTest
     p url
     get url
   end
-
-  def with_subscriber(subscriber)
-    previous_subscribers = AhoyEmail.subscribers
-    begin
-      $open_events = []
-      $click_events = []
-      AhoyEmail.subscribers = [subscriber]
-      yield
-    ensure
-      AhoyEmail.subscribers = previous_subscribers
-    end
-  end
 end
