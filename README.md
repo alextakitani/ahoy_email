@@ -353,6 +353,12 @@ end
 
 ### 2.0
 
+- It’s now possible to use all features independently. The `track` method has been broken into:
+
+  - `save_history` for message history
+  - `add_utm_params` for UTM tagging
+  - `track_events` for open & click analytics
+
 - Message history is no longer enabled by default. Create an initializer with:
 
   ```ruby

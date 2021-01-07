@@ -84,8 +84,7 @@ module AhoyEmail
       if html_part?
         part = message.html_part || message
 
-        # TODO use Nokogiri::HTML::DocumentFragment.parse in 2.0
-        doc = Nokogiri::HTML(part.body.raw_source)
+        doc = Nokogiri::HTML::DocumentFragment.parse(part.body.raw_source)
         doc.css("a[href]").each do |link|
           uri = parse_uri(link["href"])
           next unless trackable?(uri)
