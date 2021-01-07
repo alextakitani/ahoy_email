@@ -5,16 +5,15 @@ module Ahoy
     skip_after_action(*filters, raise: false)
     skip_around_action(*filters, raise: false)
 
-    def open
-      data = {}
-      verified = signature_verified?
-      if !verified && AhoyEmail.allow_unverified_opens
-        data[:unverified] = true
-        verified = true
-      end
+    protect_from_forgery with: :exception
 
-      if verified
-        publish :open, data
+    before_action :set_vars
+
+    def open
+      check_signature
+
+      if @verified || AhoyEmail.allow_unverified_opens
+        publish :open
       end
 
       send_data Base64.decode64("R0lGODlhAQABAPAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="), type: "image/gif", disposition: "inline"
@@ -23,7 +22,9 @@ module Ahoy
     def click
       url = (params[:u] || params[:url]).to_s
 
-      if signature_verified?(url: url)
+      check_signature(url: url)
+
+      if @verified
         publish :click, url: url
         redirect_to url
       else
@@ -33,24 +34,37 @@ module Ahoy
 
     protected
 
-    def signature_verified?(url: nil)
-      if params[:signature]
-        @token = params[:id]
-        user_signature = params[:signature]
-        data = url
-        signature = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
-        ActiveSupport::SecurityUtils.secure_compare(user_signature, signature)
+    def set_vars
+      if params[:id]
+        @endpoint_version = 1
+        @token = params[:id].to_s
+        @signature = params[:signature].to_s
       else
+        @endpoint_version = 2
         @token = params[:t].to_s
         @campaign = params[:c].to_s
-        user_signature = params[:s].to_s
+        @signature = params[:s].to_s
+      end
+    end
+
+    def check_signature(url: nil)
+      if @endpoint_version == 2
         data = [@token, @campaign]
         data << url if url
         data = data.join("/")
 
         # TODO use HMAC-SHA256
-        signature = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
-        ActiveSupport::SecurityUtils.secure_compare(user_signature, signature)
+        expected = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
+        @verified = ActiveSupport::SecurityUtils.secure_compare(@signature, expected)
+
+        # use separate variable for additional safety against coding errors
+        @campaign_verified = @verified
+      elsif @signature.present?
+        data = url
+        expected = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
+        @verified = ActiveSupport::SecurityUtils.secure_compare(@signature, expected)
+      else
+        @verified = false
       end
     end
 
@@ -58,11 +72,10 @@ module Ahoy
       AhoyEmail.subscribers.each do |subscriber|
         subscriber = subscriber.new if subscriber.is_a?(Class) && !subscriber.respond_to?(name)
         if subscriber.respond_to?(name)
-          event = {}
-          event[:token] = @token
+          event = {token: @token}
 
           # important - only pass campaign if verified
-          event[:campaign] = @campaign if @verified
+          event[:campaign] = @campaign if @campaign_verified
 
           # TODO move to initializer
           event[:controller] = self
