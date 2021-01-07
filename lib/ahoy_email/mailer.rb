@@ -16,7 +16,7 @@ module AhoyEmail
         set_ahoy_options(options, %i(utm_source utm_medium utm_term utm_content utm_campaign), utm_params: true)
       end
 
-      def track_events(**options)
+      def track_hits(**options)
         set_ahoy_options(options, %i(open click url_options unsubscribe_links), click: true)
       end
 

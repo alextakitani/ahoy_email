@@ -174,7 +174,7 @@ And add to mailers you want to track:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track_events
+  track_hits
 end
 ```
 
@@ -182,7 +182,7 @@ Tracks clicks by default.
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track_events open: true
+  track_hits open: true
 end
 ```
 
@@ -190,7 +190,7 @@ Set campaign
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track_events campaign: ""
+  track_hits campaign: ""
 end
 ```
 
@@ -198,7 +198,7 @@ Use only and except to limit actions
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track_events only: [:welcome]
+  track_hits only: [:welcome]
 end
 ```
 
@@ -206,7 +206,7 @@ Or use if and unless to make it conditional
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track_events if: -> { params[:user].opted_in? }
+  track_hits if: -> { params[:user].opted_in? }
 end
 ```
 
@@ -357,7 +357,7 @@ end
 
   - `save_history` for message history
   - `add_utm_params` for UTM tagging
-  - `track_events` for open & click analytics
+  - `track_hits` for open & click analytics
 
 - Message history is no longer enabled by default. Create an initializer with:
 
