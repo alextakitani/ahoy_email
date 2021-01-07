@@ -1,6 +1,5 @@
 class MessageMailer < ApplicationMailer
-  track message: false, only: [:other]
-  track message: true, only: [:other2]
+  track message: true, only: [:other, :no_deliver]
 
   after_action :prevent_delivery, only: [:no_deliver]
 
@@ -9,10 +8,6 @@ class MessageMailer < ApplicationMailer
   end
 
   def other
-    mail
-  end
-
-  def other2
     mail
   end
 

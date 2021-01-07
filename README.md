@@ -16,16 +16,9 @@ Add this line to your application’s Gemfile:
 gem 'ahoy_email'
 ```
 
-And run the generator. This creates a model to store messages.
-
-```sh
-rails generate ahoy_email:install
-rails db:migrate
-```
-
 ## Getting Started
 
-There are three main features:
+There are three main features, which can be used independently:
 
 - [Message history](#message-history)
 - [UTM tagging](#utm-tagging)
@@ -33,31 +26,52 @@ There are three main features:
 
 ## Message History
 
-Ahoy Email creates an `Ahoy::Message` record for each email sent by default. You can disable history for a mailer:
+Generate a migration to store messages:
+
+```sh
+rails generate ahoy_email:messages
+rails db:migrate
+```
+
+And add to mailers you want to track:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track message: false # use only/except to limit actions
+  save_message
 end
 ```
 
-Or by default:
+Use the `Ahoy::Message` model to query messages:
 
 ```ruby
-AhoyEmail.default_options[:message] = false
+Ahoy::Message.last
+```
+
+Use only and except to limit actions
+
+```ruby
+class CouponMailer < ApplicationMailer
+  save_message only: [:welcome]
+end
+```
+
+To store messages from all mailers, create `config/initializers/ahoy_email.rb` with:
+
+```ruby
+AhoyEmail.default_options[:message] = true
 ```
 
 ### Users
 
 Ahoy Email records the user a message is sent to - not just the email address. This gives you a history of messages for each user, even if they change addresses.
 
-By default, Ahoy tries `@user` then `params[:user]` then `User.find_by(email: message.to)` to find the user.
+By default, it tries `@user` then `params[:user]` then `User.find_by(email: message.to)` to find the user.
 
 You can pass a specific user with:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track user: -> { params[:some_user] }
+  save_message user: -> { params[:some_user] }
 end
 ```
 
@@ -95,7 +109,7 @@ Then use:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track extra: {coupon_id: 1}
+  save_message extra: {coupon_id: 1}
 end
 ```
 
@@ -103,7 +117,7 @@ You can use a proc as well.
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track extra: -> { {coupon_id: params[:coupon].id} }
+  save_message extra: -> { {coupon_id: params[:coupon].id} }
 end
 ```
 
@@ -119,7 +133,7 @@ Add UTM parameters to links with:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track utm_params: true # use only/except to limit actions
+  add_utm_params # use only/except to limit actions
 end
 ```
 
@@ -133,7 +147,7 @@ You can customize them with:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track utm_params: true, utm_campaign: -> { "coupon#{params[:coupon].id}" }
+  add_utm_params utm_campaign: -> { "coupon#{params[:coupon].id}" }
 end
 ```
 
@@ -176,7 +190,23 @@ And add to mailers you want to track:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track open: true, click: true
+  track_events
+end
+```
+
+Tracks clicks by default.
+
+```ruby
+class CouponMailer < ApplicationMailer
+  track_events open: true
+end
+```
+
+Set campaign
+
+```ruby
+class CouponMailer < ApplicationMailer
+  track_events campaign: ""
 end
 ```
 
@@ -184,15 +214,15 @@ Use only and except to limit actions
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track click: true, only: [:welcome]
+  track_events only: [:welcome]
 end
 ```
 
-Or make it conditional
+Or use if and unless to make it conditional
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  track click: -> { params[:user].opted_in? }
+  track_events if: -> { params[:user].opted_in? }
 end
 ```
 
@@ -334,6 +364,16 @@ class Ahoy::Message
   field :sent_at, type: Time
 end
 ```
+
+## Upgrading
+
+### 2.0
+
+- Message history is no longer enabled by default. Create an initializer with:
+
+  ```ruby
+  AhoyEmail.default_options[:message] = true
+  ```
 
 ## History
 

@@ -21,7 +21,7 @@ module AhoyEmail
   self.api = false
 
   self.default_options = {
-    message: true,
+    message: false,
     open: false,
     click: false,
     utm_params: false,

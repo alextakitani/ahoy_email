@@ -10,13 +10,13 @@ module AhoyEmail
     class_methods do
       def track(**options)
         before_action(options.slice(:only, :except)) do
-          self.ahoy_options = ahoy_options.merge(message: true).merge(options.except(:only, :except))
+          self.ahoy_options = ahoy_options.merge(options.except(:only, :except))
         end
       end
     end
 
     def track(**options)
-      self.ahoy_options = ahoy_options.merge(message: true).merge(options)
+      self.ahoy_options = ahoy_options.merge(options)
     end
 
     def ahoy_options
