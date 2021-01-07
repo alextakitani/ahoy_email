@@ -6,7 +6,8 @@ require "openssl"
 require "safely/core"
 
 # modules
-require "ahoy_email/count_subscriber"
+require "ahoy_email/hit_subscriber"
+require "ahoy_email/message_subscriber"
 require "ahoy_email/processor"
 require "ahoy_email/tracker"
 require "ahoy_email/observer"
@@ -67,7 +68,7 @@ module AhoyEmail
     ahoy_message
   end
 
-  self.subscribers = []
+  self.subscribers = [HitSubscriber.new]
 
   self.preserve_callbacks = []
 

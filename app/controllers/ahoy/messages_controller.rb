@@ -7,26 +7,14 @@ module Ahoy
 
     before_action :set_message
 
+    # TODO verify signature
     def open
-      # TODO move to MessageSubscriber in 2.0
-      if @message && !@message.opened_at
-        @message.opened_at = Time.now
-        @message.save!
-      end
-
       publish :open
 
       send_data Base64.decode64("R0lGODlhAQABAPAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="), type: "image/gif", disposition: "inline"
     end
 
     def click
-      # TODO move to MessageSubscriber in 2.0
-      if @message && !@message.clicked_at
-        @message.clicked_at = Time.now
-        @message.opened_at ||= @message.clicked_at if @message.respond_to?(:opened_at=)
-        @message.save!
-      end
-
       user_signature = params[:signature].to_s
       url = params[:url].to_s
 
@@ -35,8 +23,7 @@ module Ahoy
       signature = OpenSSL::HMAC.hexdigest(digest, AhoyEmail.secret_token, url)
 
       if ActiveSupport::SecurityUtils.secure_compare(user_signature, signature)
-        publish :click, url: params[:url]
-
+        publish :click, url: url
         redirect_to url
       else
         # TODO show link expired page with link to invalid redirect url in 2.0
@@ -46,22 +33,11 @@ module Ahoy
 
     protected
 
-    def set_message
-      @token = params[:id]
-      @campaign = params[:c] # TODO sign
-
-      model = AhoyEmail.message_model
-
-      return if model.respond_to?(:column_names) && !model.column_names.include?("token")
-
-      @message = model.where(token: @token).first
-    end
-
     def publish(name, event = {})
       AhoyEmail.subscribers.each do |subscriber|
         subscriber = subscriber.new if subscriber.is_a?(Class) && !subscriber.respond_to?(name)
         if subscriber.respond_to?(name)
-          event[:message] = @message
+          # TODO move to initializer
           event[:controller] = self
           event[:token] = @token
           event[:campaign] = @campaign

@@ -1,8 +1,8 @@
 class <%= migration_class_name %> < ActiveRecord::Migration<%= migration_version %>
   def change
-    create_table :ahoy_counters do |t|
+    create_table :ahoy_email_hits do |t|
       t.string :campaign
-      t.string :name
+      t.string :event_type
       t.text :url
       t.integer :total, default: 0
       t.integer :unique, default: 0
@@ -10,6 +10,6 @@ class <%= migration_class_name %> < ActiveRecord::Migration<%= migration_version
       t.datetime :created_at
     end
 
-    add_index :ahoy_counters, [:campaign, :name, :url], unique: true
+    add_index :ahoy_counters, [:campaign, :event_type, :url], unique: true
   end
 end

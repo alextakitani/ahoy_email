@@ -1,5 +1,5 @@
 module AhoyEmail
-  class CountSubscriber
+  class HitSubscriber
     def open(event)
       count_event("open", event)
     end
