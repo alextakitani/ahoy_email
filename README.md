@@ -225,13 +225,13 @@ For opens, an invisible pixel is added right before the `</body>` tag in HTML em
 For clicks, a redirect is added to links to track clicks in HTML emails.
 
 ```
-https://chartkick.com
+https://example.com
 ```
 
 becomes
 
 ```
-https://yoursite.com/ahoy/click?l=https%3A%2F%2Fchartkick.com&s=...
+https://yoursite.com/ahoy/click?u=https%3A%2F%example.com&s=...
 ```
 
 A signature is added to prevent [open redirects](https://www.owasp.org/index.php/Open_redirect).
