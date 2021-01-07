@@ -133,7 +133,7 @@ Add UTM parameters to links with:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  utm_params # use only/except to limit actions
+  utm_params
 end
 ```
 
@@ -148,6 +148,14 @@ You can customize them with:
 ```ruby
 class CouponMailer < ApplicationMailer
   utm_params utm_campaign: -> { "coupon#{params[:coupon].id}" }
+end
+```
+
+Use only and except to limit actions
+
+```ruby
+class CouponMailer < ApplicationMailer
+  utm_params only: [:welcome]
 end
 ```
 
