@@ -63,13 +63,15 @@ module AhoyEmail
 
         regex = /<\/body>/i
 
-        # TODO sign
-
+        campaign = options[:campaign]
+        data = [token, campaign].join("/")
+        signature = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
         url =
           url_for(
             controller: "ahoy/messages",
             action: "open",
             t: token,
+            c: campaign,
             s: signature,
             format: "gif"
           )
@@ -106,16 +108,19 @@ module AhoyEmail
           if options[:click] && !skip_attribute?(link, "click")
             raise "Secret token is empty" unless AhoyEmail.secret_token
 
-            # TODO sign more than just url and transition to HMAC-SHA256
-            signature = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, link["href"])
+            # TODO transition to HMAC-SHA256
+            campaign = options[:campaign]
+            url = link["href"]
+            data = [token, campaign, url].join("/")
+            signature = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
 
             link["href"] =
               url_for(
                 controller: "ahoy/messages",
                 action: "click",
+                u: url,
                 t: token,
-                u: link["href"],
-                c: options[:campaign],
+                c: campaign,
                 s: signature
               )
           end
