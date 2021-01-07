@@ -1,3 +1,7 @@
+## 2.0.0 (unreleased)
+
+- Removed support for Rails < 5.2 and Ruby < 2.6
+
 ## 1.1.1 (unreleased)
 
 - Added support for classes for subscribers
