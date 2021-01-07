@@ -1,5 +1,5 @@
 class MessageMailer < ApplicationMailer
-  save_history only: [:other, :no_deliver]
+  save_message only: [:other, :no_deliver]
 
   after_action :prevent_delivery, only: [:no_deliver]
 

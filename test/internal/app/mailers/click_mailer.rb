@@ -1,5 +1,5 @@
 class ClickMailer < ApplicationMailer
-  save_history
+  save_message
   track_hits except: [:welcome, :conditional]
   track_hits if: -> { @track }, only: [:conditional]
 

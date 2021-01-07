@@ -1,5 +1,5 @@
 class OpenMailer < ApplicationMailer
-  save_history
+  save_message
   track_hits open: true, click: false, only: [:basic]
 
   def welcome

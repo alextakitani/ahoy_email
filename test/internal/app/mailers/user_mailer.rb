@@ -1,6 +1,6 @@
 class UserMailer < ApplicationMailer
-  save_history
-  save_history user: -> { @some_user }, only: [:dynamic]
+  save_message
+  save_message user: -> { @some_user }, only: [:dynamic]
 
   def welcome
     mail

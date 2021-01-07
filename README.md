@@ -37,7 +37,7 @@ And add to mailers you want to track:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  save_history
+  save_message
 end
 ```
 
@@ -51,7 +51,7 @@ Use only and except to limit actions
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  save_history only: [:welcome]
+  save_message only: [:welcome]
 end
 ```
 
@@ -71,7 +71,7 @@ You can pass a specific user with:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  save_history user: -> { params[:some_user] }
+  save_message user: -> { params[:some_user] }
 end
 ```
 
@@ -109,7 +109,7 @@ Then use:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  save_history extra: {coupon_id: 1}
+  save_message extra: {coupon_id: 1}
 end
 ```
 
@@ -117,7 +117,7 @@ You can use a proc as well.
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  save_history extra: -> { {coupon_id: params[:coupon].id} }
+  save_message extra: -> { {coupon_id: params[:coupon].id} }
 end
 ```
 
@@ -355,7 +355,7 @@ end
 
 - It’s now possible to use all features independently. The `track` method has been broken into:
 
-  - `save_history` for message history
+  - `save_message` for message history
   - `add_utm_params` for UTM tagging
   - `track_hits` for open & click analytics
 

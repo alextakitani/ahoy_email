@@ -8,7 +8,7 @@ module AhoyEmail
     end
 
     class_methods do
-      def save_history(**options)
+      def save_message(**options)
         set_ahoy_options(options, %i(mailer user extra), message: true)
       end
 
