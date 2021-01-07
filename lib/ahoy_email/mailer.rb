@@ -28,7 +28,8 @@ module AhoyEmail
         unknown_keywords = options.keys - allowed_keywords - action_keywords
         raise ArgumentError, "unknown keywords: #{unknown_keywords.map(&:inspect).join(", ")}" if unknown_keywords.any?
 
-        before_action(options.slice(*action_keywords)) do
+        # TODO see why not prepend_after_action
+        after_action(options.slice(*action_keywords)) do
           self.ahoy_options = ahoy_options.merge(default_options).merge(options.slice(*allowed_keywords))
         end
       end
