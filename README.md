@@ -163,27 +163,11 @@ While it’s nice to get feedback on the performance of your emails, we discoura
 
 ### Setup
 
-Create a migration with:
+Generate a migration to store hits:
 
-```ruby
-class AddTokenToAhoyMessages < ActiveRecord::Migration[6.1]
-  def change
-    add_column :ahoy_messages, :token, :string
-    add_index :ahoy_messages, :token
-
-    # for opens
-    add_column :ahoy_messages, :opened_at, :timestamp
-
-    # for clicks
-    add_column :ahoy_messages, :clicked_at, :timestamp
-  end
-end
-```
-
-Create an initializer `config/initializers/ahoy_email.rb` with:
-
-```ruby
-AhoyEmail.api = true
+```sh
+rails generate ahoy_email:hits
+rails db:migrate
 ```
 
 And add to mailers you want to track:
@@ -228,7 +212,7 @@ end
 
 ### How It Works
 
-For opens, an invisible pixel is added right before the `</body>` tag in HTML emails. If the recipient has images enabled in their email client, the pixel is loaded and the open time recorded.
+For opens, an invisible pixel is added right before the `</body>` tag in HTML emails. If the recipient has images enabled in their email client, the pixel is loaded.
 
 For clicks, a redirect is added to links to track clicks in HTML emails.
 

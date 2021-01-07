@@ -1,6 +1,6 @@
 class UtmParamsMailer < ApplicationMailer
-  save_history only: [:history]
   add_utm_params except: [:welcome]
+  save_history only: [:history]
 
   def welcome
     mail_html('<a href="https://example.org">Test</a>')
