@@ -23,9 +23,9 @@ ActiveRecord::Schema.define do
     t.string :utm_campaign
   end
 
-  create_table :ahoy_counters, force: true do |t|
+  create_table :ahoy_email_hits, force: true do |t|
     t.string :campaign
-    t.string :name
+    t.string :event_type
     t.text :url
     t.integer :total, default: 0
     t.integer :unique, default: 0
@@ -33,7 +33,7 @@ ActiveRecord::Schema.define do
     t.datetime :created_at
   end
 
-  add_index :ahoy_counters, [:campaign, :name, :url], unique: true
+  add_index :ahoy_email_hits, [:campaign, :event_type, :url], unique: true
 
   create_table :users, force: true do |t|
     t.string :email

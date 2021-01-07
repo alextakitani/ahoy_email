@@ -15,11 +15,11 @@ module AhoyEmail
       count_event("click", event, url: event[:url])
     end
 
-    def count_event(name, event, url: nil)
+    def count_event(event_type, event, url: nil)
       campaign = event[:campaign]
 
-      with_lock([campaign, name, url]) do
-        counter = Ahoy::Counter.where(campaign: campaign, name: name, url: url).first_or_create!
+      with_lock([campaign, event_type, url]) do
+        counter = AhoyEmail::Hit.where(campaign: campaign, event_type: event_type, url: url).first_or_create!
 
         hll =
           if counter.data
@@ -38,7 +38,7 @@ module AhoyEmail
     end
 
     def with_lock(key)
-      connection = Ahoy::Counter.connection
+      connection = AhoyEmail::Hit.connection
 
       # MySQL and Postgres
       if connection.advisory_locks_enabled?

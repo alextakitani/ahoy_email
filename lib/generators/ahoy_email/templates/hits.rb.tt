@@ -10,6 +10,6 @@ class <%= migration_class_name %> < ActiveRecord::Migration<%= migration_version
       t.datetime :created_at
     end
 
-    add_index :ahoy_counters, [:campaign, :event_type, :url], unique: true
+    add_index :ahoy_email_hits, [:campaign, :event_type, :url], unique: true
   end
 end

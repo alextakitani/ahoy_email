@@ -12,7 +12,8 @@ class ClickTest < ActionDispatch::IntegrationTest
 
     click_link(message)
     assert_redirected_to "https://example.org"
-    assert ahoy_message.clicked_at
+    p AhoyEmail::Hit.all
+    # assert ahoy_message.clicked_at
   end
 
   def test_query_params
@@ -53,7 +54,7 @@ class ClickTest < ActionDispatch::IntegrationTest
   def test_count_subscriber
     skip if defined?(Mongoid)
 
-    with_subscriber(AhoyEmail::CountSubscriber) do
+    with_subscriber(AhoyEmail::HitSubscriber) do
       message = ClickMailer.basic.deliver_now
       click_link(message)
       click_link(message)
@@ -73,7 +74,7 @@ class ClickTest < ActionDispatch::IntegrationTest
   def test_count_subscriber_concurrency
     skip if defined?(Mongoid)
 
-    with_subscriber(AhoyEmail::CountSubscriber) do
+    with_subscriber(AhoyEmail::HitSubscriber) do
       messages = 5.times.map { ClickMailer.basic.deliver_now }
       threads = []
       messages.each do |message|
