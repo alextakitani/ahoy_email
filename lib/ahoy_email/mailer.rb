@@ -17,7 +17,7 @@ module AhoyEmail
       end
 
       def track_hits(**options)
-        set_ahoy_options(options, %i(open click url_options unsubscribe_links), click: true)
+        set_ahoy_options(options, %i(open click campaign url_options unsubscribe_links), click: true)
       end
 
       private

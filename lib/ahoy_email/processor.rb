@@ -62,11 +62,15 @@ module AhoyEmail
         raw_source = part.body.raw_source
 
         regex = /<\/body>/i
+
+        # TODO sign
+
         url =
           url_for(
             controller: "ahoy/messages",
             action: "open",
-            id: token,
+            t: token,
+            s: signature,
             format: "gif"
           )
         pixel = ActionController::Base.helpers.image_tag(url, size: "1x1", alt: "")
@@ -104,15 +108,15 @@ module AhoyEmail
 
             # TODO sign more than just url and transition to HMAC-SHA256
             signature = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, link["href"])
+
             link["href"] =
               url_for(
                 controller: "ahoy/messages",
                 action: "click",
-                id: token,
-                url: link["href"],
-                # TODO encode
-                c: options[:mailer].sub("Mailer#", "#").underscore.parameterize,
-                signature: signature
+                t: token,
+                u: link["href"],
+                c: options[:campaign],
+                s: signature
               )
           end
         end

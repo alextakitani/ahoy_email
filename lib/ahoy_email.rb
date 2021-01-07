@@ -39,6 +39,7 @@ module AhoyEmail
     # events
     open: false,
     click: false,
+    campaign: -> { "#{mailer_name.sub(/_mailer\z/, "")}-#{action_name}".parameterize },
     url_options: {},
     unsubscribe_links: false
   }
