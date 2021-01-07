@@ -231,7 +231,7 @@ https://chartkick.com
 becomes
 
 ```
-https://yoursite.com/ahoy/messages/rAnDoMtOkEn/click?url=https%3A%2F%2Fchartkick.com&signature=...
+https://yoursite.com/ahoy/click?l=https%3A%2F%2Fchartkick.com&s=...
 ```
 
 A signature is added to prevent [open redirects](https://www.owasp.org/index.php/Open_redirect).
