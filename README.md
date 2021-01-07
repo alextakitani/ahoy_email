@@ -218,6 +218,12 @@ class CouponMailer < ApplicationMailer
 end
 ```
 
+Get stats with:
+
+```ruby
+AhoyEmail.stats("my-campaign")
+```
+
 ### How It Works
 
 For opens, an invisible pixel is added right before the `</body>` tag in HTML emails. If the recipient has images enabled in their email client, the pixel is loaded.

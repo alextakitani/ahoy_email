@@ -12,8 +12,8 @@ class ClickTest < ActionDispatch::IntegrationTest
 
     click_link(message)
     assert_redirected_to "https://example.org"
-    p AhoyEmail::Hit.all
-    # assert ahoy_message.clicked_at
+
+    p AhoyEmail.stats("click-basic")
   end
 
   def test_query_params

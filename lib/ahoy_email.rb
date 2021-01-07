@@ -84,6 +84,29 @@ module AhoyEmail
   self.save_token = false
 
   self.allow_unverified_opens = false
+
+  def self.stats(campaign)
+    hits = AhoyEmail::Hit.where(campaign: campaign).to_a
+    opens = hits.find { |h| h.event_type == "open" }
+    clicks = hits.find { |h| h.event_type == "click" && !h.url }
+    urls = hits.select { |h| h.event_type == "click" && h.url }
+
+    stats = {}
+    if opens
+      stats[:opens_unique] = opens.unique
+      stats[:opens_total] = opens.total
+    end
+    stats[:clicks_unique] = clicks.try(:unique) || 0
+    stats[:clicks_total] = clicks.try(:total) || 0
+    stats[:urls] = []
+    urls.each do |url|
+      stats[:urls] << {
+        clicks_unique: url.unique,
+        clicks_total: url.total
+      }
+    end
+    stats
+  end
 end
 
 ActiveSupport.on_load(:action_mailer) do
