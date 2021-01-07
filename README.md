@@ -367,6 +367,12 @@ end
   - `utm_params` for UTM tagging
   - `track_hits` for open & click analytics
 
+  Change:
+
+  - `track message: true` to `save_message`
+  - `track utm_params: true` to `utm_params`
+  - `track open: true, click: true` to `track_hits open: true`
+
 - Message history is no longer enabled by default. Create an initializer with:
 
   ```ruby
