@@ -379,6 +379,15 @@ end
   AhoyEmail.default_options[:message] = true
   ```
 
+- Opens & clicks
+
+  ```ruby
+  AhoyEmail.allow_unverified_opens = true # remove after a week
+  AhoyEmail.save_token = true
+  AhoyEmail.default_options[:campaign] = nil
+  AhoyEmail.subscribers = [AhoyEmail::MessageSubscriber]
+  ```
+
 ## History
 
 View the [changelog](https://github.com/ankane/ahoy_email/blob/master/CHANGELOG.md)

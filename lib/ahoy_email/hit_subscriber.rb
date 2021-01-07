@@ -1,10 +1,16 @@
 module AhoyEmail
   class HitSubscriber
     def open(event)
+      # campaign only passed if verified
+      return unless event[:campaign]
+
       count_event("open", event)
     end
 
     def click(event)
+      # campaign only passed if verified
+      return unless event[:campaign]
+
       count_event("click", event)
       count_event("click", event, url: event[:url])
     end

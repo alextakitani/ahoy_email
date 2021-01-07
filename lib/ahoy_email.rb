@@ -16,7 +16,7 @@ require "ahoy_email/version"
 require "ahoy_email/engine" if defined?(Rails)
 
 module AhoyEmail
-  mattr_accessor :secret_token, :default_options, :subscribers, :invalid_redirect_url, :track_method, :api, :preserve_callbacks
+  mattr_accessor :secret_token, :default_options, :subscribers, :invalid_redirect_url, :track_method, :api, :preserve_callbacks, :save_token, :allow_unverified_opens
   mattr_writer :message_model
 
   self.api = false
@@ -58,7 +58,7 @@ module AhoyEmail
       ahoy_message.send("#{k}=", data[k.to_sym]) if ahoy_message.respond_to?("#{k}=")
     end
 
-    ahoy_message.token = data[:token] if ahoy_message.respond_to?(:token=)
+    ahoy_message.token = data[:token] if AhoyEmail.save_token && ahoy_message.respond_to?(:token=)
 
     ahoy_message.assign_attributes(data[:extra] || {})
 
@@ -68,7 +68,7 @@ module AhoyEmail
     ahoy_message
   end
 
-  self.subscribers = [HitSubscriber.new]
+  self.subscribers = [HitSubscriber]
 
   self.preserve_callbacks = []
 
@@ -79,6 +79,10 @@ module AhoyEmail
     model = model.call if model.respond_to?(:call)
     model
   end
+
+  self.save_token = false
+
+  self.allow_unverified_opens = false
 end
 
 ActiveSupport.on_load(:action_mailer) do
