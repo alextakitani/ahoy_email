@@ -12,7 +12,7 @@ module AhoyEmail
         set_ahoy_options(options, %i(mailer user extra), message: true)
       end
 
-      def add_utm_params(**options)
+      def utm_params(**options)
         set_ahoy_options(options, %i(utm_source utm_medium utm_term utm_content utm_campaign), utm_params: true)
       end
 

@@ -133,7 +133,7 @@ Add UTM parameters to links with:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  add_utm_params # use only/except to limit actions
+  utm_params # use only/except to limit actions
 end
 ```
 
@@ -147,7 +147,7 @@ You can customize them with:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  add_utm_params utm_campaign: -> { "coupon#{params[:coupon].id}" }
+  utm_params utm_campaign: -> { "coupon#{params[:coupon].id}" }
 end
 ```
 
@@ -356,7 +356,7 @@ end
 - It’s now possible to use all features independently. The `track` method has been broken into:
 
   - `save_message` for message history
-  - `add_utm_params` for UTM tagging
+  - `utm_params` for UTM tagging
   - `track_hits` for open & click analytics
 
 - Message history is no longer enabled by default. Create an initializer with:

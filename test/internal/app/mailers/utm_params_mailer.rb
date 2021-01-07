@@ -1,5 +1,5 @@
 class UtmParamsMailer < ApplicationMailer
-  add_utm_params except: [:welcome]
+  utm_params except: [:welcome]
   save_message only: [:history]
 
   def welcome
