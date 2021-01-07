@@ -15,7 +15,7 @@ module AhoyEmail
     def perform
       track_open if options[:open]
       track_links if options[:utm_params] || options[:click]
-      track_message
+      track_message if options[:message]
     end
 
     protected

@@ -1,6 +1,7 @@
 class ExtraMailer < ApplicationMailer
-  track extra: {coupon_id: 1}, only: [:basic]
-  track extra: -> { {coupon_id: @coupon_id} }, only: [:dynamic]
+  save_history
+  save_history extra: {coupon_id: 1}, only: [:basic]
+  save_history extra: -> { {coupon_id: @coupon_id} }, only: [:dynamic]
 
   def welcome
     mail

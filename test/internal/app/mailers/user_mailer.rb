@@ -1,5 +1,6 @@
 class UserMailer < ApplicationMailer
-  track user: -> { @some_user }, only: [:dynamic]
+  save_history
+  save_history user: -> { @some_user }, only: [:dynamic]
 
   def welcome
     mail

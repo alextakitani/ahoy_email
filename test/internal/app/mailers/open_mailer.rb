@@ -1,5 +1,6 @@
 class OpenMailer < ApplicationMailer
-  track open: true, only: [:basic]
+  save_history
+  track_events open: true, click: false, only: [:basic]
 
   def welcome
     mail_html('Hi')

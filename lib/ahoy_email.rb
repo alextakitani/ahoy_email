@@ -21,19 +21,24 @@ module AhoyEmail
   self.api = false
 
   self.default_options = {
+    # message history
     message: false,
-    open: false,
-    click: false,
+    mailer: -> { "#{self.class.name}##{action_name}" },
+    user: -> { (defined?(@user) && @user) || (respond_to?(:params) && params && params[:user]) || (message.to.try(:size) == 1 ? (User.find_by(email: message.to.first) rescue nil) : nil) },
+    extra: {},
+
+    # utm tagging
     utm_params: false,
     utm_source: -> { mailer_name },
     utm_medium: "email",
     utm_term: nil,
     utm_content: nil,
     utm_campaign: -> { action_name },
-    user: -> { (defined?(@user) && @user) || (respond_to?(:params) && params && params[:user]) || (message.to.try(:size) == 1 ? (User.find_by(email: message.to.first) rescue nil) : nil) },
-    mailer: -> { "#{self.class.name}##{action_name}" },
+
+    # events
+    open: false,
+    click: false,
     url_options: {},
-    extra: {},
     unsubscribe_links: false
   }
 

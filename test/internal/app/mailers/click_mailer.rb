@@ -1,6 +1,7 @@
 class ClickMailer < ApplicationMailer
-  track click: true, except: [:welcome]
-  track click: -> { @track }, only: [:conditional]
+  save_history
+  track_events except: [:welcome, :conditional]
+  track_events if: -> { @track }, only: [:conditional]
 
   def welcome
     mail_html('<a href="https://example.org">Test</a>')

@@ -1,11 +1,16 @@
 class UtmParamsMailer < ApplicationMailer
-  track utm_params: true, except: [:welcome]
+  save_history only: [:history]
+  add_utm_params except: [:welcome]
 
   def welcome
     mail_html('<a href="https://example.org">Test</a>')
   end
 
   def basic
+    mail_html('<a href="https://example.org">Test</a>')
+  end
+
+  def history
     mail_html('<a href="https://example.org">Test</a>')
   end
 

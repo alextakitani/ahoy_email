@@ -37,7 +37,7 @@ And add to mailers you want to track:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  save_message
+  save_history
 end
 ```
 
@@ -51,7 +51,7 @@ Use only and except to limit actions
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  save_message only: [:welcome]
+  save_history only: [:welcome]
 end
 ```
 
@@ -71,7 +71,7 @@ You can pass a specific user with:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  save_message user: -> { params[:some_user] }
+  save_history user: -> { params[:some_user] }
 end
 ```
 
@@ -109,7 +109,7 @@ Then use:
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  save_message extra: {coupon_id: 1}
+  save_history extra: {coupon_id: 1}
 end
 ```
 
@@ -117,7 +117,7 @@ You can use a proc as well.
 
 ```ruby
 class CouponMailer < ApplicationMailer
-  save_message extra: -> { {coupon_id: params[:coupon].id} }
+  save_history extra: -> { {coupon_id: params[:coupon].id} }
 end
 ```
 
