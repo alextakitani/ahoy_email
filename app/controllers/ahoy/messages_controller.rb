@@ -5,8 +5,6 @@ module Ahoy
     skip_after_action(*filters, raise: false)
     skip_around_action(*filters, raise: false)
 
-    before_action :set_message
-
     # TODO verify signature
     def open
       publish :open
@@ -26,8 +24,7 @@ module Ahoy
         publish :click, url: url
         redirect_to url
       else
-        # TODO show link expired page with link to invalid redirect url in 2.0
-        redirect_to AhoyEmail.invalid_redirect_url || main_app.root_url
+        render layout: false
       end
     end
 
@@ -41,7 +38,7 @@ module Ahoy
           event[:controller] = self
           event[:token] = @token
           event[:campaign] = @campaign
-          subscriber.send name, event
+          subscriber.send(name, event)
         end
       end
     end
