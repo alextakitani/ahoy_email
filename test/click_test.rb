@@ -68,6 +68,20 @@ class ClickTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_message_subscriber
+    AhoyEmail.save_token = true
+    with_subscriber(AhoyEmail::MessageSubscriber) do
+      message = ClickMailer.campaignless.deliver_now
+      refute_body /\bc=/, message
+      click_link(message)
+
+      assert ahoy_message.clicked_at
+      assert_equal 0, Ahoy::Campaign.count
+    end
+  ensure
+    AhoyEmail.save_token = false
+  end
+
   def test_count_subscriber
     skip if defined?(Mongoid)
 

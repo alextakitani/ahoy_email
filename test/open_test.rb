@@ -47,7 +47,6 @@ class OpenTest < ActionDispatch::IntegrationTest
     # unescape entities like browser does
     url = CGI.unescapeHTML(url)
 
-    p url
     get url
   end
 end

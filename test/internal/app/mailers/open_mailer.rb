@@ -1,6 +1,6 @@
 class OpenMailer < ApplicationMailer
-  track_hits open: true, click: false, only: [:basic]
-  track_hits open: true, click: false, only: [:campaignless], campaign: false
+  track_hits open: true, only: [:basic]
+  track_hits open: true, campaign: false, only: [:campaignless]
   save_message only: [:campaignless]
 
   def welcome
