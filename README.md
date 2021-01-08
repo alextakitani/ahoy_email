@@ -400,6 +400,8 @@ end
   AhoyEmail.subscribers = [AhoyEmail::MessageSubscriber]
   ```
 
+- Subscribers - `message` no longer passed. Use `Ahoy::Message.find_by(token: event[:token])` instead.
+
 ## History
 
 View the [changelog](https://github.com/ankane/ahoy_email/blob/master/CHANGELOG.md)

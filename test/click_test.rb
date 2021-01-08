@@ -110,21 +110,6 @@ class ClickTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_url
   end
 
-  def test_missing_message
-    with_subscriber(EmailSubscriber) do
-      message = ClickMailer.basic.deliver_now
-      token = ahoy_message.token
-      Ahoy::Message.delete_all
-      click_link(message)
-
-      assert_equal 1, $click_events.size
-      click_event = $click_events.first
-      assert_equal "https://example.org", click_event[:url]
-      assert_nil click_event[:message]
-      assert_equal token, click_event[:token]
-    end
-  end
-
   def test_mailto
     message = ClickMailer.mailto.deliver_now
     assert_body '<a href="mailto:hi@example.org">', message
