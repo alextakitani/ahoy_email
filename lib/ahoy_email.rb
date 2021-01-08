@@ -92,6 +92,7 @@ module AhoyEmail
   def self.signature(token:, campaign_id:, url: nil)
     data = [token, campaign_id]
     data << url if url
+
     # encode and join with a character outside encoding
     data = data.map { |v| Base64.strict_encode64(v.to_s) }.join("|")
 
