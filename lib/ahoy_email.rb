@@ -64,6 +64,8 @@ module AhoyEmail
 
     ahoy_message.token = data[:token] if AhoyEmail.save_token && ahoy_message.respond_to?(:token=)
 
+    ahoy_message.campaign_id = data[:campaign_id] if ahoy_message.respond_to?(:campaign_id=)
+
     ahoy_message.assign_attributes(data[:extra] || {})
 
     ahoy_message.sent_at = Time.now

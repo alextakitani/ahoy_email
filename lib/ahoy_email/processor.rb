@@ -36,7 +36,7 @@ module AhoyEmail
         user: options[:user]
       }
 
-      # legacy, remove in next major version
+      # TODO remove in next major version
       user = options[:user]
       if user
         data[:user_type] = user.model_name.name
@@ -53,6 +53,8 @@ module AhoyEmail
           data[k] = options[k] if options[k]
         end
       end
+
+      data[:campaign_id] = campaign.id if campaign
 
       mailer.message.ahoy_data = data
     end
