@@ -85,27 +85,18 @@ module AhoyEmail
 
   self.allow_unverified_opens = false
 
-  def self.stats(campaign)
-    hits = AhoyEmail::Hit.where(campaign: campaign).to_a
-    opens = hits.find { |h| h.event_type == "open" }
-    clicks = hits.find { |h| h.event_type == "click" && !h.url }
-    urls = hits.select { |h| h.event_type == "click" && h.url }
+  # private
+  def self.signature(token:, campaign_id:, url: nil)
+    data = [token, campaign_id]
+    data << url if url
+    # TODO encode
+    data = data.map { |v| v.to_s }.join("/")
 
-    stats = {}
-    if opens
-      stats[:opens_unique] = opens.unique
-      stats[:opens_total] = opens.total
-    end
-    stats[:clicks_unique] = clicks.try(:unique) || 0
-    stats[:clicks_total] = clicks.try(:total) || 0
-    stats[:urls] = []
-    urls.each do |url|
-      stats[:urls] << {
-        clicks_unique: url.unique,
-        clicks_total: url.total
-      }
-    end
-    stats
+    raise "Secret token is empty" unless AhoyEmail.secret_token
+
+    # TODO use HMAC-SHA256
+    # TODO use url-encoded Base64
+    OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
   end
 end
 

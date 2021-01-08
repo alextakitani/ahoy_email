@@ -64,14 +64,13 @@ module AhoyEmail
 
         regex = /<\/body>/i
 
-        data = [token, campaign.id].join("/")
-        signature = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
+        signature = AhoyEmail.signature(token: token, campaign_id: campaign.try(:id))
         url =
           url_for(
             controller: "ahoy/messages",
             action: "open",
             t: token,
-            c: campaign.id,
+            c: campaign.try(:id),
             s: signature,
             format: "gif"
           )
@@ -106,20 +105,15 @@ module AhoyEmail
           end
 
           if options[:click] && !skip_attribute?(link, "click")
-            raise "Secret token is empty" unless AhoyEmail.secret_token
-
-            # TODO transition to HMAC-SHA256
             url = link["href"]
-            data = [token, campaign.id, url].join("/")
-            signature = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
-
+            signature = AhoyEmail.signature(token: token, campaign_id: campaign.try(:id), url: url)
             link["href"] =
               url_for(
                 controller: "ahoy/messages",
                 action: "click",
                 u: url,
                 t: token,
-                c: campaign.id,
+                c: campaign.try(:id),
                 s: signature
               )
           end
@@ -173,7 +167,7 @@ module AhoyEmail
     end
 
     def campaign
-      @campaign ||= self.class.fetch_campaign(options[:campaign])
+      @campaign ||= options[:campaign] ? self.class.fetch_campaign(options[:campaign]) : nil
     end
 
     class << self

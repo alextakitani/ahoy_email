@@ -27,8 +27,27 @@ class OpenTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_message_subscriber
+    AhoyEmail.save_token = true
+    with_subscriber(AhoyEmail::MessageSubscriber) do
+      message = OpenMailer.campaignless.deliver_now
+      refute_body /\bc=/, message
+      open_message(message)
+
+      assert ahoy_message.opened_at
+      assert_equal 0, Ahoy::Campaign.count
+    end
+  ensure
+    AhoyEmail.save_token = false
+  end
+
   def open_message(message)
     url = /src=\"([^"]+)\"/.match(message.body.decoded)[1]
+
+    # unescape entities like browser does
+    url = CGI.unescapeHTML(url)
+
+    p url
     get url
   end
 end

@@ -49,12 +49,7 @@ module Ahoy
 
     def check_signature(url: nil)
       if @endpoint_version == 2
-        data = [@token, @campaign_id]
-        data << url if url
-        data = data.join("/")
-
-        # TODO use HMAC-SHA256
-        expected = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
+        expected = AhoyEmail.signature(token: @token, campaign_id: @campaign_id, url: url)
         @verified = ActiveSupport::SecurityUtils.secure_compare(@signature, expected)
 
         # use separate variable for additional safety against coding errors
@@ -75,7 +70,7 @@ module Ahoy
           event = {token: @token}
 
           # important - only pass campaign id if verified
-          event[:campaign_id] = @campaign_id if @campaign_verified
+          event[:campaign_id] = @campaign_id if @campaign_id.present? && @campaign_verified
 
           # TODO move to initializer
           event[:controller] = self
