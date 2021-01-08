@@ -12,7 +12,10 @@ class OpenTest < ActionDispatch::IntegrationTest
 
     open_message(message)
     assert_response :success
-    assert ahoy_message.opened_at
+    open_message(message)
+
+    assert_equal 2, ahoy_campaign.total_opens
+    assert_equal 1, ahoy_campaign.unique_opens
   end
 
   def test_subscriber
@@ -22,7 +25,6 @@ class OpenTest < ActionDispatch::IntegrationTest
 
       assert_equal 1, $open_events.size
       open_event = $open_events.first
-      assert_equal ahoy_message, open_event[:message]
       assert open_event[:token]
     end
   end
