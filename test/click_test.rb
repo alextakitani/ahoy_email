@@ -56,7 +56,10 @@ class ClickTest < ActionDispatch::IntegrationTest
 
     click_link(message)
     assert_redirected_to "https://example.org?a=1&b=2"
-    assert ahoy_message.clicked_at
+
+    assert_equal 1, ahoy_campaign.total_clicks
+    assert_equal "https://example.org?a=1&b=2", ahoy_url.url
+    assert_equal 1, ahoy_url.total_clicks
   end
 
   def test_subscriber
