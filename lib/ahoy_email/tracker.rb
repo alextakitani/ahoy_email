@@ -16,9 +16,7 @@ module AhoyEmail
           end
 
           if message.ahoy_campaign
-            # performs += 1 update on database-level
-            # so ahoy_campaign can be outdated
-            message.ahoy_campaign.increment!(:total_sent)
+            Ahoy::Campaign.where(id: message.ahoy_campaign.id).update_all("total_sent = total_sent + 1")
           end
         end
       end
