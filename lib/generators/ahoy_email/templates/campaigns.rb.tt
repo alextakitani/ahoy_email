@@ -1,0 +1,32 @@
+class <%= migration_class_name %> < ActiveRecord::Migration<%= migration_version %>
+  def change
+    create_table :ahoy_campaigns do |t|
+      t.string :name
+      t.integer :total_sent, default: 0
+
+      # uncomment for opens
+      # t.integer :total_opens, default: 0
+      # t.integer :unique_opens, default: 0
+      # t.binary :open_data
+
+      # clicks
+      t.integer :total_clicks, default: 0
+      t.integer :unique_clicks, default: 0
+      t.binary :click_data
+
+      t.datetime :created_at
+    end
+
+    add_index :ahoy_campaigns, [:name], unique: true
+
+    create_table :ahoy_urls do |t|
+      t.references :campaign, index: false
+      t.string :url
+      t.integer :total_clicks, default: 0
+      t.integer :unique_clicks, default: 0
+      t.binary :click_data
+    end
+
+    add_index :ahoy_urls, [:campaign_id, :url], unique: true
+  end
+end

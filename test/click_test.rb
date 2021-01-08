@@ -10,10 +10,18 @@ class ClickTest < ActionDispatch::IntegrationTest
     message = ClickMailer.basic.deliver_now
     assert_body "click", message
 
+    assert_equal 1, Ahoy::Campaign.count
+    assert_equal 0, Ahoy::Url.count
+
+    assert_equal "ClickMailer#basic", ahoy_campaign.name
+    assert_equal 1, ahoy_campaign.total_sent
+
     click_link(message)
     assert_redirected_to "https://example.org"
 
-    p AhoyEmail.stats("click-basic")
+    ahoy_campaign = Ahoy::Campaign.last
+    assert_equal 1, ahoy_campaign.total_clicks
+    assert_equal 1, ahoy_campaign.unique_clicks
   end
 
   def test_query_params

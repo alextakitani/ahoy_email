@@ -2,12 +2,12 @@ require "rails/generators/active_record"
 
 module AhoyEmail
   module Generators
-    class  HitsGenerator < Rails::Generators::Base
+    class  CampaignsGenerator < Rails::Generators::Base
       include ActiveRecord::Generators::Migration
       source_root File.join(__dir__, "templates")
 
       def copy_migration
-        migration_template "hits.rb", "db/migrate/create_ahoy_hits.rb", migration_version: migration_version
+        migration_template "campaigns.rb", "db/migrate/create_ahoy_campaigns.rb", migration_version: migration_version
       end
 
       def append_initializer

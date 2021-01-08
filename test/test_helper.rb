@@ -34,15 +34,16 @@ end
 class Minitest::Test
   def setup
     Ahoy::Message.delete_all
-    AhoyEmail::Hit.delete_all
+    Ahoy::Campaign.delete_all
+    Ahoy::Url.delete_all
   end
 
   def ahoy_message
     Ahoy::Message.last
   end
 
-  def ahoy_email_hit
-    AhoyEmail::Hit.last
+  def ahoy_campaign
+    Ahoy::Campaign.last
   end
 
   def refute_body(str, message)

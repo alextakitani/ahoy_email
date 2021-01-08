@@ -42,14 +42,14 @@ module Ahoy
       else
         @endpoint_version = 2
         @token = params[:t].to_s
-        @campaign = params[:c].to_s
+        @campaign_id = params[:c].to_s
         @signature = params[:s].to_s
       end
     end
 
     def check_signature(url: nil)
       if @endpoint_version == 2
-        data = [@token, @campaign]
+        data = [@token, @campaign_id]
         data << url if url
         data = data.join("/")
 
@@ -74,8 +74,8 @@ module Ahoy
         if subscriber.respond_to?(name)
           event = {token: @token}
 
-          # important - only pass campaign if verified
-          event[:campaign] = @campaign if @campaign_verified
+          # important - only pass campaign id if verified
+          event[:campaign_id] = @campaign_id if @campaign_verified
 
           # TODO move to initializer
           event[:controller] = self

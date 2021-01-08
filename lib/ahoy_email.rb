@@ -39,7 +39,7 @@ module AhoyEmail
     # events
     open: false,
     click: false,
-    campaign: -> { "#{mailer_name.sub(/_mailer\z/, "")}-#{action_name}".parameterize },
+    campaign: -> { "#{self.class.name}##{action_name}" },
     url_options: {},
     unsubscribe_links: false
   }
@@ -112,5 +112,5 @@ end
 ActiveSupport.on_load(:action_mailer) do
   include AhoyEmail::Mailer
   register_observer AhoyEmail::Observer
-  Mail::Message.send(:attr_accessor, :ahoy_data, :ahoy_message)
+  Mail::Message.send(:attr_accessor, :ahoy_data, :ahoy_message, :ahoy_campaign)
 end

@@ -16,6 +16,7 @@ module AhoyEmail
       track_open if options[:open]
       track_links if options[:utm_params] || options[:click]
       track_message if options[:message]
+      message.ahoy_campaign = campaign if options[:open] || options[:click]
     end
 
     protected
@@ -63,15 +64,14 @@ module AhoyEmail
 
         regex = /<\/body>/i
 
-        campaign = options[:campaign]
-        data = [token, campaign].join("/")
+        data = [token, campaign.id].join("/")
         signature = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
         url =
           url_for(
             controller: "ahoy/messages",
             action: "open",
             t: token,
-            c: campaign,
+            c: campaign.id,
             s: signature,
             format: "gif"
           )
@@ -109,9 +109,8 @@ module AhoyEmail
             raise "Secret token is empty" unless AhoyEmail.secret_token
 
             # TODO transition to HMAC-SHA256
-            campaign = options[:campaign]
             url = link["href"]
-            data = [token, campaign, url].join("/")
+            data = [token, campaign.id, url].join("/")
             signature = OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
 
             link["href"] =
@@ -120,7 +119,7 @@ module AhoyEmail
                 action: "click",
                 u: url,
                 t: token,
-                c: campaign,
+                c: campaign.id,
                 s: signature
               )
           end
@@ -171,6 +170,23 @@ module AhoyEmail
             .merge(options[:url_options])
             .merge(opt)
       AhoyEmail::Engine.routes.url_helpers.url_for(opt)
+    end
+
+    def campaign
+      @campaign ||= self.class.fetch_campaign(options[:campaign])
+    end
+
+    # TODO add mutex
+    def self.fetch_campaign(name)
+      unless campaigns[name]
+        # TODO rescue from unique error
+        campaigns[name] ||= Ahoy::Campaign.where(name: name).first_or_create!
+      end
+      campaigns[name]
+    end
+
+    def self.campaigns
+      @campaigns ||= Ahoy::Campaign.all.index_by(&:name)
     end
   end
 end

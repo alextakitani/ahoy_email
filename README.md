@@ -174,7 +174,7 @@ While it’s nice to get feedback on the performance of your emails, we discoura
 Generate a migration to store hits:
 
 ```sh
-rails generate ahoy_email:hits
+rails generate ahoy_email:campaigns
 rails db:migrate
 ```
 
@@ -221,7 +221,13 @@ end
 Get stats with:
 
 ```ruby
-AhoyEmail.stats("my-campaign")
+campaign = Ahoy::Campaign.find_by(name: "CouponMailer#welcome")
+```
+
+Get URL stats with:
+
+```ruby
+campaign.urls
 ```
 
 ### How It Works

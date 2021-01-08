@@ -1,44 +1,41 @@
 module AhoyEmail
   class HitSubscriber
     def open(event)
-      # campaign only passed if verified
-      return unless event[:campaign]
-
-      count_event("open", event)
+      count_hit(event, :total_opens, :unique_opens, :open_data)
     end
 
     def click(event)
-      # campaign only passed if verified
-      return unless event[:campaign]
-
-      count_event("click", event)
-      count_event("click", event, url: event[:url])
+      count_hit(event, :total_clicks, :unique_clicks, :click_data)
     end
 
-    def count_event(event_type, event, url: nil)
-      campaign = event[:campaign]
+    private
 
-      with_lock([campaign, event_type, url]) do
-        counter = AhoyEmail::Hit.where(campaign: campaign, event_type: event_type, url: url).first_or_create!
+    def count_hit(event, total_attribute, unique_attribute, data_attribute)
+      # campaign only passed if verified
+      return unless event[:campaign_id]
 
+      with_lock([event[:campaign_id]]) do
+        campaign = Ahoy::Campaign.find_by(id: event[:campaign_id])
+        return unless campaign
+
+        data = campaign.send(data_attribute)
         hll =
-          if counter.data
-            Hyperll::HyperLogLog.unserialize(counter.data)
+          if data
+            Hyperll::HyperLogLog.unserialize(data)
           else
             Hyperll::HyperLogLog.new(14)
           end
         hll.offer(event[:token])
 
-        counter.total += 1
-        # cache the value for BI tools
-        counter.unique = [hll.cardinality, counter.total].min
-        counter.data = hll.serialize
-        counter.save!
+        campaign.increment(total_attribute)
+        campaign.send("#{unique_attribute}=", [hll.cardinality, campaign.send(total_attribute)].min)
+        campaign.send("#{data_attribute}=", hll.serialize)
+        campaign.save!
       end
     end
 
     def with_lock(key)
-      connection = AhoyEmail::Hit.connection
+      connection = Ahoy::Campaign.connection
 
       # MySQL and Postgres
       if connection.advisory_locks_enabled?
