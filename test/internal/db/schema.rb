@@ -11,6 +11,9 @@ ActiveRecord::Schema.define do
     t.datetime :opened_at
     t.datetime :clicked_at
 
+    # campaign
+    t.references :campaign
+
     # extra
     t.integer :coupon_id
 

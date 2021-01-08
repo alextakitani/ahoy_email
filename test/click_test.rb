@@ -148,6 +148,11 @@ class ClickTest < ActionDispatch::IntegrationTest
     assert_body "click", message
   end
 
+  def test_message_campaign
+    message = ClickMailer.query_params.deliver_now
+    assert_equal ahoy_campaign, ahoy_message.campaign
+  end
+
   def click_link(message)
     url = /href=\"([^"]+)\"/.match(message.body.decoded)[1]
 

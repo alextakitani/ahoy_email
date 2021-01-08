@@ -2,7 +2,7 @@ class ClickMailer < ApplicationMailer
   track_hits except: [:welcome, :conditional]
   track_hits if: -> { @track }, only: [:conditional]
   track_hits campaign: false, only: [:campaignless]
-  save_message only: [:campaignless]
+  save_message only: [:campaignless, :query_params]
 
   def welcome
     mail_html('<a href="https://example.org">Test</a>')
