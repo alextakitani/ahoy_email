@@ -16,6 +16,8 @@ module AhoyEmail
           end
 
           if message.ahoy_campaign
+            # performs += 1 update on database-level
+            # so ahoy_campaign can be outdated
             message.ahoy_campaign.increment!(:total_sent)
           end
         end

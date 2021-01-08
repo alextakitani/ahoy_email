@@ -28,6 +28,9 @@ class ClickTest < ActionDispatch::IntegrationTest
     assert_equal "https://example.org", ahoy_url.url
     assert_equal 2, ahoy_url.total_clicks
     assert_equal 1, ahoy_url.unique_clicks
+
+    p ahoy_campaign
+    p ahoy_url
   end
 
   def test_query_params

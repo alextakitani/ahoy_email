@@ -176,15 +176,23 @@ module AhoyEmail
       @campaign ||= self.class.fetch_campaign(options[:campaign])
     end
 
-    # TODO add mutex
+    class << self
+      attr_accessor :mutex
+    end
+    self.mutex = Mutex.new
+
     def self.fetch_campaign(name)
-      unless campaigns[name]
-        # TODO rescue from unique error
-        campaigns[name] ||= Ahoy::Campaign.where(name: name).first_or_create!
+      mutex.synchronize do
+        campaigns[name] ||=
+          begin
+            Ahoy::Campaign.create!(name: name)
+          rescue ActiveRecord::RecordNotUnique
+            Ahoy::Campaign.find_by(name: name)
+          end
       end
-      campaigns[name]
     end
 
+    # no mutex needed since accessed through fetch_campaign
     def self.campaigns
       @campaigns ||= Ahoy::Campaign.all.index_by(&:name)
     end
