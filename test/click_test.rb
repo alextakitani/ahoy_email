@@ -45,6 +45,7 @@ class ClickTest < ActionDispatch::IntegrationTest
     end
     threads.map(&:join)
 
+    assert_equal 1, Ahoy::Campaign.count
     assert_equal 10, ahoy_campaign.total_clicks
     assert_equal 5, ahoy_campaign.unique_clicks
   end
