@@ -70,7 +70,6 @@ class ClickTest < ActionDispatch::IntegrationTest
       assert_equal 1, $click_events.size
       click_event = $click_events.first
       assert_equal "https://example.org", click_event[:url]
-      assert_equal ahoy_message, click_event[:message]
       assert click_event[:token]
     end
   end
@@ -83,7 +82,6 @@ class ClickTest < ActionDispatch::IntegrationTest
       assert_equal 1, $click_events.size
       click_event = $click_events.first
       assert_equal "https://example.org", click_event[:url]
-      assert_equal ahoy_message, click_event[:message]
       assert click_event[:token]
     end
   end
@@ -106,8 +104,9 @@ class ClickTest < ActionDispatch::IntegrationTest
     message = ClickMailer.basic.deliver_now
     assert_body "click", message
     url = /a href=\"([^"]+)\"/.match(message.body.decoded)[1]
-    get url.sub("signature=", "signature=bad")
-    assert_redirected_to root_url
+    get url.sub("s=", "s=bad")
+    # TODO use different status code
+    assert_response :success
   end
 
   def test_mailto
