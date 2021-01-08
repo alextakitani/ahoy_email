@@ -24,8 +24,9 @@ module AhoyEmail
     end
 
     def count_url(campaign, event)
-      with_lock([campaign.id, event[:url]], Ahoy::Url) do
-        url = campaign.urls.where(url: event[:url]).first_or_create!
+      url = event[:url].first(255)
+      with_lock([campaign.id, url], Ahoy::Url) do
+        url = campaign.urls.where(url: url).first_or_create!
         update_object(url, event, :total_clicks, :unique_clicks, :click_data)
       end
     end
