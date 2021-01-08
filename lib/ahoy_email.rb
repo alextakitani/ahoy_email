@@ -2,8 +2,11 @@
 require "active_support"
 require "addressable/uri"
 require "nokogiri"
-require "openssl"
 require "safely/core"
+
+# stdlib
+require "openssl"
+require "base64"
 
 # modules
 require "ahoy_email/hit_subscriber"
@@ -89,14 +92,12 @@ module AhoyEmail
   def self.signature(token:, campaign_id:, url: nil)
     data = [token, campaign_id]
     data << url if url
-    # TODO encode
-    data = data.map { |v| v.to_s }.join("/")
+    # encode and join with a character outside encoding
+    data = data.map { |v| Base64.strict_encode64(v.to_s) }.join("|")
 
     raise "Secret token is empty" unless AhoyEmail.secret_token
 
-    # TODO use HMAC-SHA256
-    # TODO use url-encoded Base64
-    OpenSSL::HMAC.hexdigest("SHA1", AhoyEmail.secret_token, data)
+    Base64.urlsafe_encode64(OpenSSL::HMAC.digest("SHA256", AhoyEmail.secret_token, data), padding: false)
   end
 end
 
