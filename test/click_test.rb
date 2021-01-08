@@ -28,9 +28,25 @@ class ClickTest < ActionDispatch::IntegrationTest
     assert_equal "https://example.org", ahoy_url.url
     assert_equal 2, ahoy_url.total_clicks
     assert_equal 1, ahoy_url.unique_clicks
+  end
 
-    p ahoy_campaign
-    p ahoy_url
+  def test_concurrency
+    skip if defined?(Mongoid)
+
+    ClickMailer # fix for autoload
+
+    threads = []
+    5.times do
+      threads << Thread.new do
+        message = ClickMailer.basic.deliver_now
+        click_link(message)
+        click_link(message)
+      end
+    end
+    threads.map(&:join)
+
+    assert_equal 10, ahoy_campaign.total_clicks
+    assert_equal 5, ahoy_campaign.unique_clicks
   end
 
   def test_query_params
@@ -80,45 +96,6 @@ class ClickTest < ActionDispatch::IntegrationTest
     end
   ensure
     AhoyEmail.save_token = false
-  end
-
-  def test_count_subscriber
-    skip if defined?(Mongoid)
-
-    with_subscriber(AhoyEmail::HitSubscriber) do
-      message = ClickMailer.basic.deliver_now
-      click_link(message)
-      click_link(message)
-
-      message2 = ClickMailer.basic.deliver_now
-      click_link(message2)
-
-      assert_equal 2, Ahoy::Counter.count
-      assert_equal "click-basic", ahoy_counter.campaign
-      assert_equal "click", ahoy_counter.name
-      assert_equal "https://example.org", ahoy_counter.url
-      assert_equal 3, ahoy_counter.total
-      assert_equal 2, ahoy_counter.unique
-    end
-  end
-
-  def test_count_subscriber_concurrency
-    skip if defined?(Mongoid)
-
-    with_subscriber(AhoyEmail::HitSubscriber) do
-      messages = 5.times.map { ClickMailer.basic.deliver_now }
-      threads = []
-      messages.each do |message|
-        threads << Thread.new do
-          click_link(message)
-          click_link(message)
-        end
-      end
-      threads.map(&:join)
-
-      assert_equal 10, ahoy_counter.total
-      assert_equal 5, ahoy_counter.unique
-    end
   end
 
   def test_bad_signature
