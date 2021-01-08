@@ -5,7 +5,8 @@ module AhoyEmail
     end
 
     def click(event)
-      count_hit(event, :total_clicks, :unique_clicks, :click_data)
+      campaign = count_hit(event, :total_clicks, :unique_clicks, :click_data)
+      count_url(campaign, event) if campaign
     end
 
     private
@@ -14,28 +15,39 @@ module AhoyEmail
       # campaign only passed if verified
       return unless event[:campaign_id]
 
-      with_lock([event[:campaign_id]]) do
+      campaign = nil
+      with_lock([event[:campaign_id]], Ahoy::Campaign) do
         campaign = Ahoy::Campaign.find_by(id: event[:campaign_id])
-        return unless campaign
+        update_object(campaign, event, total_attribute, unique_attribute, data_attribute) if campaign
+      end
+      campaign
+    end
 
-        data = campaign.send(data_attribute)
-        hll =
-          if data
-            Hyperll::HyperLogLog.unserialize(data)
-          else
-            Hyperll::HyperLogLog.new(14)
-          end
-        hll.offer(event[:token])
-
-        campaign.increment(total_attribute)
-        campaign.send("#{unique_attribute}=", [hll.cardinality, campaign.send(total_attribute)].min)
-        campaign.send("#{data_attribute}=", hll.serialize)
-        campaign.save!
+    def count_url(campaign, event)
+      with_lock([campaign.id, event[:url]], Ahoy::Url) do
+        url = campaign.urls.where(url: event[:url]).first_or_create!
+        update_object(url, event, :total_clicks, :unique_clicks, :click_data)
       end
     end
 
-    def with_lock(key)
-      connection = Ahoy::Campaign.connection
+    def update_object(obj, event, total_attribute, unique_attribute, data_attribute)
+      data = obj.send(data_attribute)
+      hll =
+        if data
+          Hyperll::HyperLogLog.unserialize(data)
+        else
+          Hyperll::HyperLogLog.new(14)
+        end
+      hll.offer(event[:token])
+
+      obj.increment(total_attribute)
+      obj.send("#{unique_attribute}=", [hll.cardinality, obj.send(total_attribute)].min)
+      obj.send("#{data_attribute}=", hll.serialize)
+      obj.save!
+    end
+
+    def with_lock(key, model)
+      connection = model.connection
 
       # MySQL and Postgres
       if connection.advisory_locks_enabled?

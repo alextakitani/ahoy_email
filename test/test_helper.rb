@@ -46,6 +46,10 @@ class Minitest::Test
     Ahoy::Campaign.last
   end
 
+  def ahoy_url
+    Ahoy::Url.last
+  end
+
   def refute_body(str, message)
     refute_match str, message.body.decoded
   end

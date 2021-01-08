@@ -18,10 +18,16 @@ class ClickTest < ActionDispatch::IntegrationTest
 
     click_link(message)
     assert_redirected_to "https://example.org"
+    click_link(message)
 
-    ahoy_campaign = Ahoy::Campaign.last
-    assert_equal 1, ahoy_campaign.total_clicks
+    assert_equal 2, ahoy_campaign.total_clicks
     assert_equal 1, ahoy_campaign.unique_clicks
+
+    assert_equal 1, Ahoy::Url.count
+    assert_equal ahoy_campaign, ahoy_url.campaign
+    assert_equal "https://example.org", ahoy_url.url
+    assert_equal 2, ahoy_url.total_clicks
+    assert_equal 1, ahoy_url.unique_clicks
   end
 
   def test_query_params
