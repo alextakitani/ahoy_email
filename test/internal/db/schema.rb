@@ -12,7 +12,7 @@ ActiveRecord::Schema.define do
     t.datetime :clicked_at
 
     # campaign
-    t.references :campaign
+    t.string :campaign
 
     # extra
     t.integer :coupon_id

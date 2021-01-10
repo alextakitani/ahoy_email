@@ -42,14 +42,14 @@ module Ahoy
       else
         @endpoint_version = 2
         @token = params[:t].to_s
-        @campaign_id = params[:c].to_s
+        @campaign = params[:c].to_s
         @signature = params[:s].to_s
       end
     end
 
     def check_signature(url: nil)
       if @endpoint_version == 2
-        expected = AhoyEmail.signature(token: @token, campaign_id: @campaign_id, url: url)
+        expected = AhoyEmail.signature(token: @token, campaign: @campaign, url: url)
         @verified = ActiveSupport::SecurityUtils.secure_compare(@signature, expected)
 
         # use separate variable for additional safety against coding errors
@@ -64,20 +64,17 @@ module Ahoy
     end
 
     def publish(name, data = {})
-      AhoyEmail.subscribers.each do |subscriber|
-        subscriber = subscriber.new if subscriber.is_a?(Class) && !subscriber.respond_to?(name)
-        if subscriber.respond_to?(name)
-          event = {token: @token}
+      event = {token: @token}
 
-          # important - only pass campaign id if verified
-          event[:campaign_id] = @campaign_id if @campaign_id.present? && @campaign_verified
+      # important - only pass campaign id if verified
+      event[:campaign] = @campaign if @campaign.present? && @campaign_verified
 
-          # TODO move to initializer
-          event[:controller] = self
+      # TODO move to initializer
+      event[:controller] = self
 
-          subscriber.send(name, event.merge(data))
-        end
-      end
+      event.merge!(data)
+
+      AhoyEmail.publish(name, event)
     end
   end
 end

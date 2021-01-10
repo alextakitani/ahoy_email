@@ -1,5 +1,10 @@
 module AhoyEmail
   class HitSubscriber
+    def sent(event)
+      query = ["INSERT INTO ahoy_campaigns (name, total_sent) VALUES (?, 1) ON CONFLICT (name) DO UPDATE SET total_sent = ahoy_campaigns.total_sent + 1", event[:campaign]]
+      Ahoy::Campaign.connection.execute(Ahoy::Campaign.send(:sanitize_sql_array, query))
+    end
+
     def open(event)
       count_hit(event, :total_opens, :unique_opens, :open_data)
     end
@@ -13,11 +18,11 @@ module AhoyEmail
 
     def count_hit(event, total_attribute, unique_attribute, data_attribute)
       # campaign only passed if verified
-      return unless event[:campaign_id]
+      return unless event[:campaign]
 
       campaign = nil
-      with_lock([event[:campaign_id]], Ahoy::Campaign) do
-        campaign = Ahoy::Campaign.find_by(id: event[:campaign_id])
+      with_lock([event[:campaign]], Ahoy::Campaign) do
+        campaign = Ahoy::Campaign.find_by(name: event[:campaign])
         update_object(campaign, event, total_attribute, unique_attribute, data_attribute) if campaign
       end
       campaign

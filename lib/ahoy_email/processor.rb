@@ -16,7 +16,7 @@ module AhoyEmail
       track_open if options[:open]
       track_links if options[:utm_params] || options[:click]
       track_message if options[:message]
-      message.ahoy_campaign = campaign if options[:open] || options[:click]
+      message.ahoy_campaign_data = {token: token, campaign: campaign} if campaign && (options[:open] || options[:click])
     end
 
     protected
@@ -54,7 +54,7 @@ module AhoyEmail
         end
       end
 
-      data[:campaign_id] = campaign.id if campaign
+      data[:campaign] = campaign
 
       mailer.message.ahoy_data = data
     end
@@ -66,13 +66,13 @@ module AhoyEmail
 
         regex = /<\/body>/i
 
-        signature = AhoyEmail.signature(token: token, campaign_id: campaign.try(:id))
+        signature = AhoyEmail.signature(token: token, campaign: campaign)
         url =
           url_for(
             controller: "ahoy/messages",
             action: "open",
             t: token,
-            c: campaign.try(:id),
+            c: campaign,
             s: signature,
             format: "gif"
           )
@@ -108,14 +108,14 @@ module AhoyEmail
 
           if options[:click] && !skip_attribute?(link, "click")
             url = link["href"]
-            signature = AhoyEmail.signature(token: token, campaign_id: campaign.try(:id), url: url)
+            signature = AhoyEmail.signature(token: token, campaign: campaign, url: url)
             link["href"] =
               url_for(
                 controller: "ahoy/messages",
                 action: "click",
                 u: url,
                 t: token,
-                c: campaign.try(:id),
+                c: campaign,
                 s: signature
               )
           end
@@ -169,28 +169,7 @@ module AhoyEmail
     end
 
     def campaign
-      @campaign ||= options[:campaign] ? self.class.fetch_campaign(options[:campaign]) : nil
-    end
-
-    class << self
-      attr_accessor :mutex
-    end
-    self.mutex = Mutex.new
-
-    def self.fetch_campaign(name)
-      mutex.synchronize do
-        campaigns[name] ||=
-          begin
-            Ahoy::Campaign.create!(name: name)
-          rescue ActiveRecord::RecordNotUnique
-            Ahoy::Campaign.find_by(name: name)
-          end
-      end
-    end
-
-    # no mutex needed since accessed through fetch_campaign
-    def self.campaigns
-      @campaigns ||= Ahoy::Campaign.all.index_by(&:name)
+      options[:campaign] ? options[:campaign] : nil
     end
   end
 end

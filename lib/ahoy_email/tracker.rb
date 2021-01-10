@@ -15,8 +15,8 @@ module AhoyEmail
             message.ahoy_message = AhoyEmail.track_method.call(data)
           end
 
-          if message.ahoy_campaign
-            Ahoy::Campaign.where(id: message.ahoy_campaign.id).update_all("total_sent = total_sent + 1")
+          if message.ahoy_campaign_data
+            AhoyEmail.publish(:sent, message.ahoy_campaign_data)
           end
         end
       end

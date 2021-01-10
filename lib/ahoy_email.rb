@@ -42,7 +42,7 @@ module AhoyEmail
     # events
     open: false,
     click: false,
-    campaign: -> { "#{self.class.name}##{action_name}" },
+    campaign: -> { "#{mailer_name.sub(/_mailer\z/, "")}-#{action_name}".gsub("_", "-").parameterize },
     url_options: {},
     unsubscribe_links: false
   }
@@ -64,7 +64,7 @@ module AhoyEmail
 
     ahoy_message.token = data[:token] if AhoyEmail.save_token && ahoy_message.respond_to?(:token=)
 
-    ahoy_message.campaign_id = data[:campaign_id] if ahoy_message.respond_to?(:campaign_id=)
+    ahoy_message.campaign = data[:campaign] if ahoy_message.respond_to?(:campaign=)
 
     ahoy_message.assign_attributes(data[:extra] || {})
 
@@ -91,8 +91,8 @@ module AhoyEmail
   self.allow_unverified_opens = false
 
   # private
-  def self.signature(token:, campaign_id:, url: nil)
-    data = [token, campaign_id]
+  def self.signature(token:, campaign:, url: nil)
+    data = [token, campaign]
     data << url if url
 
     # encode and join with a character outside encoding
@@ -102,10 +102,20 @@ module AhoyEmail
 
     Base64.urlsafe_encode64(OpenSSL::HMAC.digest("SHA256", AhoyEmail.secret_token, data), padding: false)
   end
+
+  # private
+  def self.publish(name, event)
+    AhoyEmail.subscribers.each do |subscriber|
+      subscriber = subscriber.new if subscriber.is_a?(Class) && !subscriber.respond_to?(name)
+      if subscriber.respond_to?(name)
+        subscriber.send(name, event.dup)
+      end
+    end
+  end
 end
 
 ActiveSupport.on_load(:action_mailer) do
   include AhoyEmail::Mailer
   register_observer AhoyEmail::Observer
-  Mail::Message.send(:attr_accessor, :ahoy_data, :ahoy_message, :ahoy_campaign)
+  Mail::Message.send(:attr_accessor, :ahoy_data, :ahoy_message, :ahoy_campaign_data)
 end

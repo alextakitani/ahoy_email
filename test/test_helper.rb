@@ -36,7 +36,6 @@ class Minitest::Test
     Ahoy::Message.delete_all
     Ahoy::Campaign.delete_all
     Ahoy::Url.delete_all
-    AhoyEmail::Processor.campaigns.clear
   end
 
   def ahoy_message
