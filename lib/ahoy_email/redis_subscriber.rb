@@ -48,6 +48,7 @@ module AhoyEmail
       redis.smembers("ahoy_email:campaigns:#{campaign_id}:urls").each do |url|
         url_prefix = "ahoy_email:campaigns:#{campaign_id}:urls:#{url}"
         stats[:urls] << {
+          url: url,
           total_clicks: redis.get("#{url_prefix}:total_clicks").to_i,
           unique_clicks: redis.pfcount("#{url_prefix}:unique_clicks"),
         }

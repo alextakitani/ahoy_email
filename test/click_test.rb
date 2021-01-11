@@ -110,7 +110,16 @@ class ClickTest < ActionDispatch::IntegrationTest
       click_link(message)
       click_link(message)
 
-      p subscriber.stats(Ahoy::Campaign.last.id)
+      stats = subscriber.stats(Ahoy::Campaign.last.id)
+      assert_equal 1, stats[:total_sent]
+      assert_equal 2, stats[:total_clicks]
+      assert_equal 1, stats[:unique_clicks]
+      assert_equal 1, stats[:urls].size
+
+      url_stats = stats[:urls].first
+      assert_equal "https://example.org", url_stats[:url]
+      assert_equal 2, url_stats[:total_clicks]
+      assert_equal 1, url_stats[:unique_clicks]
     end
   end
 
