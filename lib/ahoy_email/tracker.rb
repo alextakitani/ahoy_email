@@ -17,6 +17,8 @@ module AhoyEmail
 
           if message.ahoy_campaign
             Ahoy::Campaign.where(id: message.ahoy_campaign.id).update_all("total_sent = total_sent + 1")
+            # TODO add token
+            AhoyEmail.publish(:sent, {campaign_id: message.ahoy_campaign.id})
           end
         end
       end

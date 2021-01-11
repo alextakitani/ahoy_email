@@ -105,6 +105,16 @@ module AhoyEmail
 
     Base64.urlsafe_encode64(OpenSSL::HMAC.digest("SHA256", AhoyEmail.secret_token, data), padding: false)
   end
+
+  # private
+  def self.publish(name, event)
+    AhoyEmail.subscribers.each do |subscriber|
+      subscriber = subscriber.new if subscriber.is_a?(Class) && !subscriber.respond_to?(name)
+      if subscriber.respond_to?(name)
+        subscriber.send(name, event.dup)
+      end
+    end
+  end
 end
 
 ActiveSupport.on_load(:action_mailer) do

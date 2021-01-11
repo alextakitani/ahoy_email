@@ -6,6 +6,11 @@ module AhoyEmail
       @redis = Redis.new
     end
 
+    def sent(event)
+      campaign_prefix = "ahoy_email:campaigns:#{event[:campaign_id]}"
+      redis.incr("#{campaign_prefix}:total_sent")
+    end
+
     def open(event)
       campaign_prefix = "ahoy_email:campaigns:#{event[:campaign_id]}"
       redis.incr("#{campaign_prefix}:total_opens")
@@ -26,9 +31,9 @@ module AhoyEmail
     def stats(campaign_id)
       campaign_prefix = "ahoy_email:campaigns:#{campaign_id}"
 
-      stats = {}
-
-      # TODO total sent
+      stats = {
+        total_sent: redis.get("#{campaign_prefix}:total_sent").to_i
+      }
 
       total_opens = redis.get("#{campaign_prefix}:total_opens").to_i
       if total_opens > 0

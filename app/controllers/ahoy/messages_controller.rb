@@ -64,20 +64,17 @@ module Ahoy
     end
 
     def publish(name, data = {})
-      AhoyEmail.subscribers.each do |subscriber|
-        subscriber = subscriber.new if subscriber.is_a?(Class) && !subscriber.respond_to?(name)
-        if subscriber.respond_to?(name)
-          event = {token: @token}
+      event = {token: @token}
 
-          # important - only pass campaign id if verified
-          event[:campaign_id] = @campaign_id if @campaign_id.present? && @campaign_verified
+      # important - only pass campaign id if verified
+      event[:campaign_id] = @campaign_id if @campaign_id.present? && @campaign_verified
 
-          # TODO move to initializer
-          event[:controller] = self
+      # TODO move to initializer
+      event[:controller] = self
 
-          subscriber.send(name, event.merge(data))
-        end
-      end
+      event.merge!(data)
+
+      AhoyEmail.publish(name, event)
     end
   end
 end
