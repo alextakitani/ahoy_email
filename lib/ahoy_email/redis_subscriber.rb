@@ -22,10 +22,10 @@ module AhoyEmail
       redis.incr("#{campaign_prefix}:total_clicks")
       redis.pfadd("#{campaign_prefix}:unique_clicks", event[:token])
 
-      url_prefix = "ahoy_email:campaigns:#{event[:campaign_id]}:urls:#{event[:url]}"
+      url_prefix = "#{campaign_prefix}:urls:#{event[:url]}"
       redis.incr("#{url_prefix}:total_clicks")
       redis.pfadd("#{url_prefix}:unique_clicks", event[:token])
-      redis.sadd("ahoy_email:campaigns:#{event[:campaign_id]}:urls", event[:url])
+      redis.sadd("#{campaign_prefix}:urls", event[:url])
     end
 
     def stats(campaign_id)
@@ -45,8 +45,8 @@ module AhoyEmail
       stats[:unique_clicks] = redis.pfcount("#{campaign_prefix}:unique_clicks")
 
       stats[:urls] = []
-      redis.smembers("ahoy_email:campaigns:#{campaign_id}:urls").each do |url|
-        url_prefix = "ahoy_email:campaigns:#{campaign_id}:urls:#{url}"
+      redis.smembers("#{campaign_prefix}:urls").each do |url|
+        url_prefix = "#{campaign_prefix}:urls:#{url}"
         stats[:urls] << {
           url: url,
           total_clicks: redis.get("#{url_prefix}:total_clicks").to_i,

@@ -120,6 +120,8 @@ class ClickTest < ActionDispatch::IntegrationTest
       assert_equal "https://example.org", url_stats[:url]
       assert_equal 2, url_stats[:total_clicks]
       assert_equal 1, url_stats[:unique_clicks]
+
+      p stats
     end
   end
 
