@@ -29,4 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pg"
   spec.add_development_dependency "mysql2"
   spec.add_development_dependency "hyperll"
+  spec.add_development_dependency "redis"
 end

@@ -101,6 +101,19 @@ class ClickTest < ActionDispatch::IntegrationTest
     AhoyEmail.save_token = false
   end
 
+  def test_redis_subscriber
+    subscriber = AhoyEmail::RedisSubscriber.new
+    subscriber.redis.flushdb
+
+    with_subscriber(subscriber) do
+      message = ClickMailer.basic.deliver_now
+      click_link(message)
+      click_link(message)
+
+      p subscriber.stats(Ahoy::Campaign.last.id)
+    end
+  end
+
   def test_bad_signature
     message = ClickMailer.basic.deliver_now
     assert_body "click", message

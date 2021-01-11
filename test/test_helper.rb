@@ -4,6 +4,7 @@ Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
 require "hyperll"
+require "redis"
 
 AhoyEmail.api = true
 

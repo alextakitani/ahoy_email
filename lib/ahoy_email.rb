@@ -8,9 +8,12 @@ require "safely/core"
 require "openssl"
 require "base64"
 
-# modules
+# subscribers
 require "ahoy_email/hit_subscriber"
 require "ahoy_email/message_subscriber"
+require "ahoy_email/redis_subscriber"
+
+# modules
 require "ahoy_email/processor"
 require "ahoy_email/tracker"
 require "ahoy_email/observer"
